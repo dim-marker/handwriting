@@ -1,5 +1,10 @@
 import { db, ref, get, update } from './firebase-config.js';
 
+// GitHub hesab və repozitoriya məlumatlarınız (Öz adlarınızla əvəz edin)
+const GITHUB_OWNER = "dim-marker"; 
+const GITHUB_REPO = "handwriting";  
+const GITHUB_PATH = "images";       
+
 let currentUser = null;
 let currentTask = null;
 let currentTaskKey = null;
@@ -16,9 +21,15 @@ const unreadableBtn = document.getElementById('unreadable-btn');
 const approveBtn = document.getElementById('approve-btn');
 const correctBtn = document.getElementById('correct-btn');
 
+// 1. Giriş Məntiqi (Login)
 loginBtn.addEventListener('click', async () => {
-  const u = document.getElementById('username').value;
-  const p = document.getElementById('password').value;
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value.trim();
+
+  if (!u || !p) {
+    alert('Lütfən istifadəçi adı və şifrəni daxil edin!');
+    return;
+  }
 
   const snapshot = await get(ref(db, 'users'));
   if (snapshot.exists()) {
@@ -34,9 +45,12 @@ loginBtn.addEventListener('click', async () => {
     } else {
       document.getElementById('login-error').classList.remove('hidden');
     }
+  } else {
+    alert('Bazada heç bir istifadəçi tapılmadı!');
   }
 });
 
+// 2. Vaxtölçən (Timer)
 function startTimer() {
   clearInterval(timerInterval);
   secondsElapsed = 0;
@@ -48,50 +62,89 @@ function startTimer() {
   }, 1000);
 }
 
+// 3. GitHub-dan Şəkilləri və Firebase-dən Tapşırıqları Yükləmək
 async function loadRandomTask() {
   startTimer();
   document.getElementById('transcription-text').value = '';
   
-  const snapshot = await get(ref(db, 'tasks'));
-  if (!snapshot.exists()) {
-    alert('Bazada heç bir tapşırıq yoxdur!');
-    return;
-  }
+  try {
+    // GitHub qovluğundan şəkilləri çəkirik
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`);
+    const files = await res.json();
 
-  const tasks = snapshot.val();
-  // Statusu 'completed' olmayan istənilən tapşırığı seçirik
-  const eligibleKeys = Object.keys(tasks).filter(key => {
-    const t = tasks[key];
-    return t.status !== 'completed';
-  });
+    if (!Array.isArray(files)) {
+      alert('GitHub qovluğu oxunmadı! Repozitoriya adlarını yoxlayın.');
+      return;
+    }
 
-  if (eligibleKeys.length === 0) {
-    alert('Aktiv tapşırıq qalmadı.');
-    return;
-  }
+    const imageFiles = files.filter(f => f.type === 'file' && /\.(jpg|jpeg|png)$/i.test(f.name));
 
-  // Təsadüfi tapşırıq seçimi
-  currentTaskKey = eligibleKeys[Math.floor(Math.random() * eligibleKeys.length)];
-  currentTask = tasks[currentTaskKey];
+    if (imageFiles.length === 0) {
+      alert('GitHub "images" qovluğunda heç bir şəkil tapılmadı!');
+      return;
+    }
 
-  document.getElementById('task-image').src = currentTask.imageUrl;
+    const snapshot = await get(ref(db, 'tasks'));
+    const tasksData = snapshot.exists() ? snapshot.val() : {};
 
-  // Rejimin müəyyənləşdirilməsi
-  const tCount = currentTask.transcriptions ? Object.keys(currentTask.transcriptions).length : 0;
-  
-  if (tCount < 2) {
-    // A və B marker rejimi: Şəkildən yazı yığmaq
-    document.getElementById('task-mode-title').innerText = "Əl yazısını yığın (Yazma Rejimi)";
-    document.getElementById('verification-actions').classList.add('hidden');
-    submitBtn.classList.remove('hidden');
-  } else {
-    // C və D marker rejimi: Yoxlama / Təsdiqləmə
-    document.getElementById('task-mode-title').innerText = "Mətni yoxlayın və təsdiqləyin";
-    document.getElementById('transcription-text').value = currentTask.transcriptions.A?.text || '';
-    document.getElementById('verification-actions').classList.remove('hidden');
-    submitBtn.classList.add('hidden');
+    // Aktiv və uyğun şəkillərin filtrlənməsi
+    const eligibleImages = imageFiles.filter(img => {
+      const taskKey = img.name.replace(/\./g, '_');
+      const t = tasksData[taskKey];
+
+      if (t && t.status === 'completed') return false;
+      if (t && t.unreadable) return false; // Oxunmaz işarələnənləri ötür
+
+      // İstifadəçi bu şəkildə əvvəlcədən iştirak edibsə keç
+      const userInvolved = 
+        (t?.transcriptions?.A?.markerId === currentUser.id) ||
+        (t?.transcriptions?.B?.markerId === currentUser.id) ||
+        (t?.verifications?.C?.markerId === currentUser.id) ||
+        (t?.verifications?.D?.markerId === currentUser.id);
+
+      return !userInvolved;
+    });
+
+    if (eligibleImages.length === 0) {
+      alert('Sizin üçün yeni aktiv şəkil qalmadı.');
+      return;
+    }
+
+    // Təsadüfi şəkil seçimi
+    const randomImage = eligibleImages[Math.floor(Math.random() * eligibleImages.length)];
+    currentTaskKey = randomImage.name.replace(/\./g, '_');
+
+    currentTask = tasksData[currentTaskKey] || {
+      imageUrl: randomImage.download_url,
+      status: 'pending',
+      unreadable: false
+    };
+
+    document.getElementById('task-image').src = currentTask.imageUrl;
+
+    // A, B (Yazma) yoxsa C, D (Yoxlama) rejimi
+    const tCount = currentTask.transcriptions ? Object.keys(currentTask.transcriptions).length : 0;
+    
+    if (tCount < 2) {
+      document.getElementById('task-mode-title').innerText = "Əl yazısını yığın (Yazma Rejimi - A/B)";
+      document.getElementById('verification-actions').classList.add('hidden');
+      submitBtn.classList.remove('hidden');
+      unreadableBtn.classList.remove('hidden');
+    } else {
+      document.getElementById('task-mode-title').innerText = "Mətni yoxlayın və təsdiqləyin (Təsdiq Rejimi - C/D)";
+      document.getElementById('transcription-text').value = currentTask.transcriptions.A?.text || '';
+      document.getElementById('verification-actions').classList.remove('hidden');
+      submitBtn.classList.add('hidden');
+      unreadableBtn.classList.add('hidden');
+    }
+
+  } catch (error) {
+    console.error("Xəta baş verdi:", error);
+    alert('Şəkilləri yükləmək mümkün olmadı: ' + error.message);
   }
 }
+
+// 4. İşin Bazaya Yazılması və Statistika Yenilənməsi
 async function saveWork(dataPayload) {
   const userUpdates = {
     [`users/${currentUser.id}/totalTimeSpentSec`]: (currentUser.totalTimeSpentSec || 0) + secondsElapsed,
@@ -102,12 +155,15 @@ async function saveWork(dataPayload) {
   loadRandomTask();
 }
 
+// A və B markerləri üçün mətni göndərmə düyməsi
 submitBtn.addEventListener('click', () => {
   const text = document.getElementById('transcription-text').value.trim();
   if (!text) return alert('Lütfən mətni daxil edin!');
 
   const slot = (!currentTask.transcriptions || !currentTask.transcriptions.A) ? 'A' : 'B';
   const payload = {
+    [`tasks/${currentTaskKey}/imageUrl`]: currentTask.imageUrl,
+    [`tasks/${currentTaskKey}/status`]: 'verifying',
     [`tasks/${currentTaskKey}/transcriptions/${slot}`]: {
       markerId: currentUser.id,
       text: text,
@@ -119,47 +175,4 @@ submitBtn.addEventListener('click', () => {
   saveWork(payload);
 });
 
-approveBtn.addEventListener('click', () => {
-  const slot = (!currentTask.verifications || !currentTask.verifications.C) ? 'C' : 'D';
-  const isCompleted = slot === 'D'; // D də təsdiqlədisə tapşırıq tamamlanır
-
-  const payload = {
-    [`tasks/${currentTaskKey}/verifications/${slot}`]: {
-      markerId: currentUser.id,
-      approved: true,
-      durationSec: secondsElapsed,
-      timestamp: Date.now()
-    },
-    [`tasks/${currentTaskKey}/status`]: isCompleted ? 'completed' : 'verifying'
-  };
-
-  saveWork(payload);
-});
-
-correctBtn.addEventListener('click', () => {
-  const updatedText = document.getElementById('transcription-text').value.trim();
-  const slot = (!currentTask.verifications || !currentTask.verifications.C) ? 'C' : 'D';
-
-  const payload = {
-    [`tasks/${currentTaskKey}/verifications/${slot}`]: {
-      markerId: currentUser.id,
-      approved: false,
-      correctedText: updatedText,
-      durationSec: secondsElapsed,
-      timestamp: Date.now()
-    }
-  };
-
-  saveWork(payload);
-});
-
-unreadableBtn.addEventListener('click', () => {
-  const payload = {
-    [`tasks/${currentTaskKey}/unreadable`]: true,
-    [`tasks/${currentTaskKey}/unreadableFlaggedBy`]: currentUser.id
-  };
-  alert('Şəkil oxunmaz olaraq işarələndi və başqa markerə ötürüldü.');
-  saveWork(payload);
-});
-
-logoutBtn.addEventListener('click', () => location.reload());
+// C və D markerlə
