@@ -29,7 +29,38 @@
         <p>Oxunmaz Şəkillər</p>
       </div>
     </div>
-
+<!-- Yeni Marker Qeydiyyatı Formu -->
+<div class="card">
+  <h3>Yeni Marker Qeydiyyatı</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+    <div class="form-group">
+      <label>Ad:</label>
+      <input type="text" id="reg-name" placeholder="Məsələn: Əli">
+    </div>
+    <div class="form-group">
+      <label>Soyad:</label>
+      <input type="text" id="reg-surname" placeholder="Məsələn: Əliyev">
+    </div>
+    <div class="form-group">
+      <label>Ata Adı:</label>
+      <input type="text" id="reg-patronymic" placeholder="Məsələn: Vəli oğlu">
+    </div>
+    <div class="form-group">
+      <label>FİN Kod (7 simvol):</label>
+      <input type="text" id="reg-fin" maxlength="7" placeholder="Məsələn: 1234567">
+    </div>
+    <div class="form-group">
+      <label>İstifadəçi Adı (Login):</label>
+      <input type="text" id="reg-username" placeholder="Məsələn: a.aliyev">
+    </div>
+    <div class="form-group">
+      <label>Şifrə:</label>
+      <input type="password" id="reg-password" placeholder="Şifrə daxil edin">
+    </div>
+  </div>
+  <button id="register-marker-btn" class="success" style="margin-top: 10px;">Marker-i Qeydiyyata Al</button>
+  <p id="reg-success-msg" style="color: green; margin-top: 10px;" class="hidden">Marker uğurla qeydiyyata alındı!</p>
+</div>
     <!-- Markerlərin Siyahısı və Perfomans -->
     <div class="card">
       <h3>Marker Performansı (Orta Vaxt)</h3>
