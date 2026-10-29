@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Paneli - Analitika və Monitorinq</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h2>Real-Vaxt Admin Monitorinq Paneli</h2>
+
+    <!-- Statistika Kartları -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3 id="stat-images">0</h3>
+        <p>Ümumi Şəkillər</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="stat-texts">0</h3>
+        <p>Yığılmış Yoxlamalar</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="stat-markers">0</h3>
+        <p>Aktiv Markerlər</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="stat-unreadable">0</h3>
+        <p>Oxunmaz Şəkillər</p>
+      </div>
+    </div>
+
+    <!-- Markerlərin Siyahısı və Perfomans -->
+    <div class="card">
+      <h3>Marker Performansı (Orta Vaxt)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Marker Adı (FIN)</th>
+            <th>Tamamladığı İş Sayı</th>
+            <th>Ümumi Sərf Olunan Vaxt</th>
+            <th>Orta Vaxt (İş başına)</th>
+          </tr>
+        </thead>
+        <tbody id="markers-table-body">
+          <!-- Dinamik dolacaq -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tapşırıqların Vəziyyəti -->
+    <div class="card">
+      <h3>Təsdiqlənmiş / Təsdiqlənməmiş Qeydlər</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Şəkil</th>
+            <th>Status</th>
+            <th>A/B Mətni</th>
+            <th>C/D Təsdiq</th>
+            <th>Oxunmazlıq</th>
+          </tr>
+        </thead>
+        <tbody id="tasks-table-body">
+          <!-- Dinamik dolacaq -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
