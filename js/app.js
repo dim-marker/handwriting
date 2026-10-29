@@ -53,34 +53,30 @@ async function loadRandomTask() {
   document.getElementById('transcription-text').value = '';
   
   const snapshot = await get(ref(db, 'tasks'));
-  if (!snapshot.exists()) return alert('Bazada tapşırıq yoxdur!');
-
-  const tasks = snapshot.val();
-  const eligibleKeys = Object.keys(tasks).filter(key => {
-    const t = tasks[key];
-    
-    // Əgər istifadəçi bu tapşırıqda artıq A, B, C, D kimi iştirak edibsə ötürsün
-    const userInvolved = 
-      (t.transcriptions?.A?.markerId === currentUser.id) ||
-      (t.transcriptions?.B?.markerId === currentUser.id) ||
-      (t.verifications?.C?.markerId === currentUser.id) ||
-      (t.verifications?.D?.markerId === currentUser.id);
-
-    return !userInvolved && t.status !== 'completed';
-  });
-
-  if (eligibleKeys.length === 0) {
-    alert('Hələlik sizə uyğun yeni tapşırıq yoxdur.');
+  if (!snapshot.exists()) {
+    alert('Bazada heç bir tapşırıq yoxdur!');
     return;
   }
 
-  // Təsadüfi tapşırıq seçimi (Random)
+  const tasks = snapshot.val();
+  // Statusu 'completed' olmayan istənilən tapşırığı seçirik
+  const eligibleKeys = Object.keys(tasks).filter(key => {
+    const t = tasks[key];
+    return t.status !== 'completed';
+  });
+
+  if (eligibleKeys.length === 0) {
+    alert('Aktiv tapşırıq qalmadı.');
+    return;
+  }
+
+  // Təsadüfi tapşırıq seçimi
   currentTaskKey = eligibleKeys[Math.floor(Math.random() * eligibleKeys.length)];
   currentTask = tasks[currentTaskKey];
 
   document.getElementById('task-image').src = currentTask.imageUrl;
 
-  // Rejimin müəyyənləşdirilməsi (Yazma yoxsa Təsdiqləmə)
+  // Rejimin müəyyənləşdirilməsi
   const tCount = currentTask.transcriptions ? Object.keys(currentTask.transcriptions).length : 0;
   
   if (tCount < 2) {
@@ -91,12 +87,11 @@ async function loadRandomTask() {
   } else {
     // C və D marker rejimi: Yoxlama / Təsdiqləmə
     document.getElementById('task-mode-title').innerText = "Mətni yoxlayın və təsdiqləyin";
-    document.getElementById('transcription-text').value = currentTask.transcriptions.A.text;
+    document.getElementById('transcription-text').value = currentTask.transcriptions.A?.text || '';
     document.getElementById('verification-actions').classList.remove('hidden');
     submitBtn.classList.add('hidden');
   }
 }
-
 async function saveWork(dataPayload) {
   const userUpdates = {
     [`users/${currentUser.id}/totalTimeSpentSec`]: (currentUser.totalTimeSpentSec || 0) + secondsElapsed,
