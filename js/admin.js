@@ -1,14 +1,20 @@
-import { db, ref, onValue } from './firebase-config.js';
+import { db, ref, set, push, onValue } from './firebase-config.js';
 
+// DOM Elementləri - Statistika
 const statImages = document.getElementById('stat-images');
 const statTexts = document.getElementById('stat-texts');
 const statMarkers = document.getElementById('stat-markers');
 const statUnreadable = document.getElementById('stat-unreadable');
 
+// DOM Elementləri - Cədvəllər
 const markersTableBody = document.getElementById('markers-table-body');
 const tasksTableBody = document.getElementById('tasks-table-body');
 
-// Real-vaxt izləmə (onValue)
+// DOM Elementləri - Qeydiyyat forması
+const registerBtn = document.getElementById('register-marker-btn');
+const successMsg = document.getElementById('reg-success-msg');
+
+// 1. Real-vaxt rejimində Firebase-dən məlumatların oxunması və statistika
 onValue(ref(db), (snapshot) => {
   if (!snapshot.exists()) return;
 
@@ -16,7 +22,7 @@ onValue(ref(db), (snapshot) => {
   const users = data.users || {};
   const tasks = data.tasks || {};
 
-  // 1. Ümumi Statistikalar
+  // Ümumi Statistikalar
   const totalTasks = Object.keys(tasks).length;
   let totalVerifications = 0;
   let totalUnreadable = 0;
@@ -33,7 +39,7 @@ onValue(ref(db), (snapshot) => {
   statMarkers.innerText = markerList.length;
   statUnreadable.innerText = totalUnreadable;
 
-  // 2. Marker Cədvəli
+  // Marker Performans Cədvəli
   markersTableBody.innerHTML = '';
   markerList.forEach(m => {
     const avgSec = m.completedCount ? Math.round(m.totalTimeSpentSec / m.completedCount) : 0;
@@ -47,7 +53,7 @@ onValue(ref(db), (snapshot) => {
     markersTableBody.innerHTML += row;
   });
 
-  // 3. Tapşırıqlar Cədvəli
+  // Tapşırıqlar Cədvəli
   tasksTableBody.innerHTML = '';
   Object.keys(tasks).forEach(key => {
     const t = tasks[key];
@@ -64,3 +70,50 @@ onValue(ref(db), (snapshot) => {
     tasksTableBody.innerHTML += row;
   });
 });
+
+// 2. Yeni Marker Qeydiyyatı Məntiqi
+if (registerBtn) {
+  registerBtn.addEventListener('click', async () => {
+    const name = document.getElementById('reg-name').value.trim();
+    const surname = document.getElementById('reg-surname').value.trim();
+    const patronymic = document.getElementById('reg-patronymic').value.trim();
+    const fin = document.getElementById('reg-fin').value.trim();
+    const username = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value.trim();
+
+    if (!name || !surname || !fin || !username || !password) {
+      alert('Lütfən bütün əsas sahələri doldurun!');
+      return;
+    }
+
+    // Firebase-də yeni marker düyünü yaradırıq
+    const newUserRef = push(ref(db, 'users'));
+    
+    const markerData = {
+      fullName: `${surname} ${name} ${patronymic}`,
+      fin: fin.toUpperCase(),
+      username: username,
+      password: password,
+      role: 'marker',
+      totalTimeSpentSec: 0,
+      completedCount: 0
+    };
+
+    try {
+      await set(newUserRef, markerData);
+      successMsg.classList.remove('hidden');
+      
+      // Formu təmizləyirik
+      document.getElementById('reg-name').value = '';
+      document.getElementById('reg-surname').value = '';
+      document.getElementById('reg-patronymic').value = '';
+      document.getElementById('reg-fin').value = '';
+      document.getElementById('reg-username').value = '';
+      document.getElementById('reg-password').value = '';
+
+      setTimeout(() => successMsg.classList.add('hidden'), 4000);
+    } catch (error) {
+      alert('Xəta baş verdi: ' + error.message);
+    }
+  });
+}
