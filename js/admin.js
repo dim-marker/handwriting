@@ -34,41 +34,54 @@ onValue(ref(db), (snapshot) => {
 
   const markerList = Object.values(users).filter(u => u.role === 'marker');
 
-  statImages.innerText = totalTasks;
-  statTexts.innerText = totalVerifications;
-  statMarkers.innerText = markerList.length;
-  statUnreadable.innerText = totalUnreadable;
+  if (statImages) statImages.innerText = totalTasks;
+  if (statTexts) statTexts.innerText = totalVerifications;
+  if (statMarkers) statMarkers.innerText = markerList.length;
+  if (statUnreadable) statUnreadable.innerText = totalUnreadable;
 
   // Marker Performans Cədvəli
-  markersTableBody.innerHTML = '';
-  markerList.forEach(m => {
-    const avgSec = m.completedCount ? Math.round(m.totalTimeSpentSec / m.completedCount) : 0;
-    
-    const row = `<tr>
-      <td>${m.fullName} (${m.fin})</td>
-      <td>${m.completedCount || 0}</td>
-      <td>${m.totalTimeSpentSec || 0} san</td>
-      <td><strong>${avgSec} san/iş</strong></td>
-    </tr>`;
-    markersTableBody.innerHTML += row;
-  });
+  if (markersTableBody) {
+    markersTableBody.innerHTML = '';
+    markerList.forEach(m => {
+      const avgSec = m.completedCount ? Math.round(m.totalTimeSpentSec / m.completedCount) : 0;
+      
+      const row = `<tr>
+        <td>${m.fullName} (${m.fin})</td>
+        <td>${m.completedCount || 0}</td>
+        <td>${m.totalTimeSpentSec || 0} san</td>
+        <td><strong>${avgSec} san/iş</strong></td>
+      </tr>`;
+      markersTableBody.innerHTML += row;
+    });
+  }
 
-  // Tapşırıqlar Cədvəli
-  tasksTableBody.innerHTML = '';
-  Object.keys(tasks).forEach(key => {
-    const t = tasks[key];
-    const textA = t.transcriptions?.A?.text || '-';
-    const statusText = t.status === 'completed' ? '✅ Təsdiqlənib' : '⏳ Gözləmədə';
-    
-    const row = `<tr>
-      <td><a href="${t.imageUrl}" target="_blank">Şəkilə bax</a></td>
-      <td>${statusText}</td>
-      <td>${textA}</td>
-      <td>${t.verifications ? Object.keys(t.verifications).length : 0} / 2</td>
-      <td>${t.unreadable ? '⚠️ Oxunmaz' : 'Normal'}</td>
-    </tr>`;
-    tasksTableBody.innerHTML += row;
-  });
+  // Tapşırıqlar Cədvəli (A və B yazılarını ayrı-ayrı göstərməklə)
+  if (tasksTableBody) {
+    tasksTableBody.innerHTML = '';
+    Object.keys(tasks).forEach(key => {
+      const t = tasks[key];
+      
+      // A və B markerlərinin transkripsiya mətnləri
+      const textA = t.transcriptions?.A?.text || '<span style="color: #94a3b8;">Yazılmayıb</span>';
+      const textB = t.transcriptions?.B?.text || '<span style="color: #94a3b8;">Yazılmayıb</span>';
+      
+      let statusText = '⏳ Gözləmədə';
+      if (t.status === 'completed') {
+        statusText = '✅ Təsdiqlənib';
+      } else if (t.unreadable) {
+        statusText = '⚠️ Oxunmaz';
+      }
+
+      const row = `<tr>
+        <td><a href="${t.imageUrl}" target="_blank">Şəkilə bax</a></td>
+        <td>${statusText}</td>
+        <td><strong>A:</strong> ${textA}</td>
+        <td><strong>B:</strong> ${textB}</td>
+        <td>${t.verifications ? Object.keys(t.verifications).length : 0} / 2</td>
+      </tr>`;
+      tasksTableBody.innerHTML += row;
+    });
+  }
 });
 
 // 2. Yeni Marker Qeydiyyatı Məntiqi
@@ -86,7 +99,6 @@ if (registerBtn) {
       return;
     }
 
-    // Firebase-də yeni marker düyünü yaradırıq
     const newUserRef = push(ref(db, 'users'));
     
     const markerData = {
@@ -101,7 +113,7 @@ if (registerBtn) {
 
     try {
       await set(newUserRef, markerData);
-      successMsg.classList.remove('hidden');
+      if (successMsg) successMsg.classList.remove('hidden');
       
       // Formu təmizləyirik
       document.getElementById('reg-name').value = '';
@@ -111,7 +123,9 @@ if (registerBtn) {
       document.getElementById('reg-username').value = '';
       document.getElementById('reg-password').value = '';
 
-      setTimeout(() => successMsg.classList.add('hidden'), 4000);
+      if (successMsg) {
+        setTimeout(() => successMsg.classList.add('hidden'), 4000);
+      }
     } catch (error) {
       alert('Xəta baş verdi: ' + error.message);
     }
