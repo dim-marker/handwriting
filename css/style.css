@@ -1,5 +1,5 @@
 /* ==========================================
-   1. ÜMUMI VƏ RESET QAYDALARI
+   ÜMUMI VƏ RESET QAYDALARI
    ========================================== */
 * {
   box-sizing: border-box;
@@ -20,6 +20,251 @@ body {
 
 .hidden {
   display: none !important;
+}
+
+/* ==========================================
+    İŞ SAHƏSİ (WORKSPACE) VƏ SCROLL / ZOOM
+   ========================================== */
+.workspace-container {
+  width: 100%;
+  max-width: 1400px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.user-badge {
+  font-weight: 600;
+  color: #0f172a;
+  margin-right: 15px;
+}
+
+.timer-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.workspace-body-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Şəkil Qutusu (Scroll və Zoom aktiv) */
+.image-viewer-full {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.image-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.image-toolbar h3 {
+  font-size: 16px;
+  color: #334155;
+  margin: 0;
+}
+
+.zoom-info {
+  font-size: 12px;
+  color: #0284c7;
+  background: #e0f2fe;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.zoom-reset-btn {
+  padding: 5px 12px;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  color: #334155;
+}
+.zoom-reset-btn:hover {
+  background: #cbd5e1;
+}
+
+/* Scroll dəstəkli geniş şəkil sahəsi */
+.image-wrapper-full {
+  width: 100%;
+  height: 600px;
+  overflow: auto; /* Scroll işləməsi üçün vacibdir */
+  border: 1px solid #94a3b8;
+  border-radius: 6px;
+  background: #ffffff;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-wrapper-full img {
+  max-width: none !important;
+  width: auto;
+  height: 90%;
+  object-fit: contain;
+  transition: transform 0.05s ease-out;
+  transform-origin: center center;
+  cursor: grab;
+}
+
+/* Redaktor Paneli */
+.editor-panel-full {
+  background: #f1f5f9;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+}
+
+.comparison-box {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #cbd5e1;
+}
+
+.comparison-box h4 {
+  font-size: 14px;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.selectable-card {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 6px;
+  border: 2px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.selectable-card:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.selectable-card.selected {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  box-shadow: 0 0 8px rgba(22, 163, 74, 0.2);
+}
+
+.text-card strong {
+  display: block;
+  color: #2563eb;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.text-card p {
+  color: #1e293b;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.input-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 15px;
+  outline: none;
+  background: #ffffff;
+}
+
+.input-group textarea:focus {
+  border-color: #2563eb;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.success-btn {
+  flex: 1;
+  padding: 12px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.warning-btn {
+  flex: 1;
+  padding: 12px;
+  background: #ca8a04;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.danger-btn {
+  padding: 8px 16px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* ==========================================
