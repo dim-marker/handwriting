@@ -65,11 +65,28 @@ body {
 }
 
 /* Şəkil Qutusu (Scroll və Zoom aktiv) */
-.image-viewer-full {
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 15px;
+.image-wrapper-full {
+  width: 100%;
+  height: 400px; /* Hündürlüyü 650px-dən 400px-ə endirdik (daha yığcam və standart) */
+  overflow: auto; 
+  border: 1px solid #94a3b8;
+  border-radius: 6px;
+  background: #ffffff;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-wrapper-full img {
+  max-width: 100% !important; /* Şəklin ilkin olaraq qutuya sığmasını təmin edir */
+  max-height: 100% !important;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.05s ease-out;
+  transform-origin: center center;
+  cursor: grab;
 }
 
 .image-toolbar {
