@@ -303,3 +303,32 @@ th {
 tr:hover {
   background-color: #f8fafc;
 }
+
+/* Statistika Göstəriciləri Üçün Şık Grid Blokları */
+.stats-container, 
+body > div > div:nth-of-type(-n+4),
+div[style*="display: flex"] {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+/* Hər bir statistika və ya məlumat kartı görünüşü */
+.stat-box, div[style*="background"], h3 + div {
+  background: #f8fafc;
+  padding: 15px 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+/* Başlıqların sərhədləri və rəngi */
+h1, h2, h3 {
+  color: #0f172a;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 6px;
+}
