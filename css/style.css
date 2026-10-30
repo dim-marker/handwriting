@@ -214,3 +214,37 @@ body {
   margin-top: 10px;
   text-align: center;
 }
+/* Admin Paneli və Ümumi Konteyner Üslubu */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 30px auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Admin başlıqları və cədvəlləri üçün əlavə səliqə */
+h1, h2, h3 {
+  color: #0f172a;
+  margin-bottom: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f1f5f9;
+  color: #334155;
+}
