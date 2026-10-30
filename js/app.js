@@ -9,7 +9,7 @@ let currentTask = null;
 let currentTaskKey = null;
 let timerInterval = null;
 let secondsElapsed = 0;
-let scale = 1; // Şəkil üçün Zoom dəyişəni
+let scale = 1; // Zoom miqyası
 
 const loginCard = document.getElementById('login-card');
 const workspaceCard = document.getElementById('workspace-card');
@@ -20,7 +20,6 @@ const unreadableBtn = document.getElementById('unreadable-btn');
 const approveBtn = document.getElementById('approve-btn');
 const correctBtn = document.getElementById('correct-btn');
 
-// Tablar arası keçid
 window.switchAuthTab = function(tabName) {
   const loginForm = document.getElementById('form-login');
   const regForm = document.getElementById('form-register');
@@ -40,7 +39,6 @@ window.switchAuthTab = function(tabName) {
   }
 }
 
-// Giriş Məntiqi
 loginBtn.addEventListener('click', async () => {
   const u = document.getElementById('login-username').value.trim();
   const p = document.getElementById('login-password').value.trim();
@@ -69,7 +67,6 @@ loginBtn.addEventListener('click', async () => {
   }
 });
 
-// Qeydiyyat Məntiqi
 document.getElementById('register-btn').addEventListener('click', async () => {
   const fullName = document.getElementById('reg-fullname').value.trim();
   const fin = document.getElementById('reg-fin').value.trim();
@@ -107,7 +104,6 @@ document.getElementById('register-btn').addEventListener('click', async () => {
   window.switchAuthTab('login');
 });
 
-// Taymer funksiyası
 function startTimer() {
   clearInterval(timerInterval);
   secondsElapsed = 0;
@@ -120,28 +116,56 @@ function startTimer() {
   }, 1000);
 }
 
-// Şəkil Zoom Düymələri
-document.getElementById('zoom-in')?.addEventListener('click', () => {
-  scale += 0.25;
-  document.getElementById('task-image').style.transform = `scale(${scale})`;
-});
+// -------------------------------------------------------------
+// MOUSE SCROLL İLƏ ZOOM (BÖYÜDÜB-KİÇİLTMƏ) MƏNTİQİ
+// -------------------------------------------------------------
+const imageContainer = document.getElementById('image-scroll-container');
+const taskImage = document.getElementById('task-image');
 
-document.getElementById('zoom-out')?.addEventListener('click', () => {
-  if (scale > 0.5) {
-    scale -= 0.25;
-    document.getElementById('task-image').style.transform = `scale(${scale})`;
-  }
-});
+if (imageContainer && taskImage) {
+  imageContainer.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (e.deltaY < 0) {
+      scale += 0.15; // Yuxarı fırlatanda böyüyür
+    } else {
+      scale -= 0.15; // Aşağı fırlatanda kiçilir
+      if (scale < 0.5) scale = 0.5;
+    }
+    taskImage.style.transform = `scale(${scale})`;
+  }, { passive: false });
+}
 
 document.getElementById('zoom-reset')?.addEventListener('click', () => {
   scale = 1;
-  document.getElementById('task-image').style.transform = `scale(${scale})`;
+  if (taskImage) taskImage.style.transform = `scale(1)`;
 });
 
-// Təsadüfi Tapşırıq Yükləmə (A/B və ya C/D rejimləri)
+// A və ya B kartına kliklədikdə seçilməsi və textarea-ya yazılması
+window.selectTranscription = function(type) {
+  const cardA = document.getElementById('card-a');
+  const cardB = document.getElementById('card-b');
+  const textarea = document.getElementById('transcription-text');
+
+  cardA.classList.remove('selected');
+  cardB.classList.remove('selected');
+
+  if (type === 'A') {
+    cardA.classList.add('selected');
+    textarea.value = currentTask.transcriptions?.A?.text || '';
+  } else {
+    cardB.classList.add('selected');
+    textarea.value = currentTask.transcriptions?.B?.text || '';
+  }
+};
+
 async function loadRandomTask() {
   startTimer();
   document.getElementById('transcription-text').value = '';
+  scale = 1;
+  if (taskImage) taskImage.style.transform = `scale(1)`;
+
+  document.getElementById('card-a')?.classList.remove('selected');
+  document.getElementById('card-b')?.classList.remove('selected');
   
   try {
     const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`);
@@ -192,11 +216,7 @@ async function loadRandomTask() {
       unreadable: false
     };
 
-    document.getElementById('task-image').src = currentTask.imageUrl;
-    
-    // Şəkil dəyişəndə zoom-u sıfırlayırıq
-    scale = 1;
-    document.getElementById('task-image').style.transform = `scale(1)`;
+    taskImage.src = currentTask.imageUrl;
 
     const tCount = currentTask.transcriptions ? Object.keys(currentTask.transcriptions).length : 0;
     
@@ -205,7 +225,6 @@ async function loadRandomTask() {
     const textareaLabel = document.getElementById('textarea-label');
 
     if (tCount < 2) {
-      // Yazma Rejimi (A və ya B)
       document.getElementById('task-mode-title').innerText = "Əl yazısını yığın (Yazma Rejimi - A/B)";
       if (comparisonPanel) comparisonPanel.classList.add('hidden');
       if (verificationActions) verificationActions.classList.add('hidden');
@@ -213,22 +232,19 @@ async function loadRandomTask() {
       unreadableBtn.classList.remove('hidden');
       if (textareaLabel) textareaLabel.innerText = "Mətn (Transkripsiya):";
     } else {
-      // Təsdiq Rejimi (C və ya D) - Həm A, həm B mətnlərini göstəririk
       document.getElementById('task-mode-title').innerText = "Mətni yoxlayın və təsdiqləyin (Təsdiq Rejimi - C/D)";
       
-      const textAView = document.getElementById('text-a-view');
-      const textBView = document.getElementById('text-b-view');
-      if (textAView) textAView.innerText = currentTask.transcriptions.A?.text || 'Yazılmayıb';
-      if (textBView) textBView.innerText = currentTask.transcriptions.B?.text || 'Yazılmayıb';
+      document.getElementById('text-a-view').innerText = currentTask.transcriptions.A?.text || 'Yazılmayıb';
+      document.getElementById('text-b-view').innerText = currentTask.transcriptions.B?.text || 'Yazılmayıb';
 
       if (comparisonPanel) comparisonPanel.classList.remove('hidden');
       if (verificationActions) verificationActions.classList.remove('hidden');
       submitBtn.classList.add('hidden');
       unreadableBtn.classList.add('hidden');
       
-      if (textareaLabel) textareaLabel.innerText = "Dəqiq / Düzəliş olunmuş mətn:";
-      // İlkin olaraq A-nın mətnini yazırıq ki, istəsə üzərində düzəliş etsin
-      document.getElementById('transcription-text').value = currentTask.transcriptions.A?.text || '';
+      if (textareaLabel) textareaLabel.innerText = "Seçilmiş və ya düzəliş edilmiş mətn:";
+      // İlkin olaraq A-nı avtomatik seçirik
+      selectTranscription('A');
     }
 
   } catch (error) {
@@ -236,7 +252,6 @@ async function loadRandomTask() {
   }
 }
 
-// İşin Bazaya Yazılması
 async function saveWork(dataPayload) {
   const userUpdates = {
     [`users/${currentUser.id}/totalTimeSpentSec`]: (currentUser.totalTimeSpentSec || 0) + secondsElapsed,
@@ -247,7 +262,6 @@ async function saveWork(dataPayload) {
   loadRandomTask();
 }
 
-// Transkripsiya Göndər (A və ya B)
 submitBtn.addEventListener('click', () => {
   const text = document.getElementById('transcription-text').value.trim();
   if (!text) return alert('Lütfən mətni daxil edin!');
@@ -267,7 +281,6 @@ submitBtn.addEventListener('click', () => {
   saveWork(payload);
 });
 
-// Təsdiqlə (C və ya D - Düzgündür)
 approveBtn.addEventListener('click', () => {
   const slot = (!currentTask.verifications || !currentTask.verifications.C) ? 'C' : 'D';
   const isCompleted = slot === 'D';
@@ -285,7 +298,6 @@ approveBtn.addEventListener('click', () => {
   saveWork(payload);
 });
 
-// Düzəliş Et (C və ya D - Səhvdir, yenisini yazır)
 correctBtn.addEventListener('click', () => {
   const updatedText = document.getElementById('transcription-text').value.trim();
   if (!updatedText) return alert('Düzəliş olunmuş mətni daxil edin!');
@@ -307,7 +319,6 @@ correctBtn.addEventListener('click', () => {
   saveWork(payload);
 });
 
-// Oxunmaz İşarələ
 unreadableBtn.addEventListener('click', () => {
   const payload = {
     [`tasks/${currentTaskKey}/imageUrl`]: currentTask.imageUrl,
@@ -319,5 +330,4 @@ unreadableBtn.addEventListener('click', () => {
   saveWork(payload);
 });
 
-// Çıxış
 logoutBtn.addEventListener('click', () => location.reload());
