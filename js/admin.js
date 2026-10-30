@@ -5,6 +5,8 @@ const adminDashboard = document.getElementById('admin-dashboard');
 const adminLoginBtn = document.getElementById('admin-login-btn');
 const adminLogoutBtn = document.getElementById('admin-logout-btn');
 
+let allMarkersData = []; // Axtarış üçün qlobal massiv
+
 // Admin Giriş Məntiqi
 adminLoginBtn.addEventListener('click', async () => {
   const u = document.getElementById('admin-username').value.trim();
@@ -15,13 +17,12 @@ adminLoginBtn.addEventListener('click', async () => {
     return;
   }
 
-  // Bazadan admin istifadəçisini yoxlayırıq (və ya xüsusi admin yoxlaması)
   const snapshot = await get(ref(db, 'users'));
   if (snapshot.exists()) {
     const users = snapshot.val();
     const foundKey = Object.keys(users).find(k => users[k].username === u && users[k].password === p && users[k].role === 'admin');
 
-    if (foundKey || (u === 'admin' && p === 'admin123')) { // Ehtiyat olaraq standart admin dəstəyi
+    if (foundKey || (u === 'admin' && p === 'admin123')) {
       adminLoginCard.classList.add('hidden');
       adminDashboard.classList.remove('hidden');
       initAdminPanel();
@@ -29,7 +30,6 @@ adminLoginBtn.addEventListener('click', async () => {
       document.getElementById('admin-login-error').classList.remove('hidden');
     }
   } else {
-    // Əgər bazada heç user yoxdursa standart admin ilə giriş
     if (u === 'admin' && p === 'admin123') {
       adminLoginCard.classList.add('hidden');
       adminDashboard.classList.remove('hidden');
@@ -42,7 +42,6 @@ adminLoginBtn.addEventListener('click', async () => {
 
 adminLogoutBtn.addEventListener('click', () => location.reload());
 
-// Accordion açılıb-bağlanma funksiyası
 window.toggleAccordion = function(id) {
   const content = document.getElementById(id);
   content.classList.toggle('hidden');
@@ -56,7 +55,7 @@ function initAdminPanel() {
 
   const markersTableBody = document.getElementById('markers-table-body');
   const tasksTableBody = document.getElementById('tasks-table-body');
-  const markersEditContainer = document.getElementById('markers-edit-container');
+  const markersEditTableBody = document.getElementById('markers-edit-table-body');
 
   onValue(ref(db), (snapshot) => {
     if (!snapshot.exists()) return;
@@ -76,42 +75,15 @@ function initAdminPanel() {
     });
 
     const markerList = Object.entries(users).filter(([id, u]) => u.role === 'marker');
+    allMarkersData = markerList; // Axtarış üçün yadda saxlayırıq
 
     if (statImages) statImages.innerText = totalTasks;
     if (statTexts) statTexts.innerText = totalVerifications;
     if (statMarkers) statMarkers.innerText = markerList.length;
     if (statUnreadable) statUnreadable.innerText = totalUnreadable;
 
-    // Marker Redaktə Siyahısı (Accordion içində)
-    if (markersEditContainer) {
-      markersEditContainer.innerHTML = '';
-      markerList.forEach(([mId, m]) => {
-        const card = document.createElement('div');
-        card.className = 'marker-edit-card';
-        card.innerHTML = `
-          <div class="marker-edit-grid">
-            <div>
-              <label style="font-size:12px">Ad və Soyad</label>
-              <input type="text" id="edit-name-${mId}" value="${m.fullName || ''}">
-            </div>
-            <div>
-              <label style="font-size:12px">FİN Kod</label>
-              <input type="text" id="edit-fin-${mId}" value="${m.fin || ''}">
-            </div>
-            <div>
-              <label style="font-size:12px">İstifadəçi Adı</label>
-              <input type="text" id="edit-user-${mId}" value="${m.username || ''}">
-            </div>
-            <div>
-              <label style="font-size:12px">Şifrə</label>
-              <input type="text" id="edit-pass-${mId}" value="${m.password || ''}">
-            </div>
-          </div>
-          <button class="save-marker-btn" onclick="updateMarker('${mId}')">Yadda saxla</button>
-        `;
-        markersEditContainer.appendChild(card);
-      });
-    }
+    // Marker Redaktə Cədvəlini doldururuq
+    renderMarkersTable(markerList);
 
     // Marker Performans Cədvəli
     if (markersTableBody) {
@@ -150,7 +122,37 @@ function initAdminPanel() {
   });
 }
 
-// Marker məlumatlarını yeniləmək üçün qlobal funksiya
+// Markerlər cədvəlini (redaktə üçün) çəkən köməkçi funksiya
+function renderMarkersTable(list) {
+  const tbody = document.getElementById('markers-edit-table-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+  list.forEach(([mId, m]) => {
+    tbody.innerHTML += `
+      <tr>
+        <td><input type="text" id="edit-name-${mId}" value="${m.fullName || ''}"></td>
+        <td><input type="text" id="edit-fin-${mId}" value="${m.fin || ''}"></td>
+        <td><input type="text" id="edit-user-${mId}" value="${m.username || ''}"></td>
+        <td><input type="text" id="edit-pass-${mId}" value="${m.password || ''}"></td>
+        <td><button class="save-marker-btn" onclick="updateMarker('${mId}')">Yadda saxla</button></td>
+      </tr>`;
+  });
+}
+
+// Axtarış Funksiyası
+window.filterMarkersTable = function() {
+  const query = document.getElementById('marker-search-input').value.toLowerCase();
+  const filtered = allMarkersData.filter(([mId, m]) => {
+    const fullName = (m.fullName || '').toLowerCase();
+    const fin = (m.fin || '').toLowerCase();
+    const username = (m.username || '').toLowerCase();
+    return fullName.includes(query) || fin.includes(query) || username.includes(query);
+  });
+  renderMarkersTable(filtered);
+};
+
+// Marker məlumatlarını yeniləmək
 window.updateMarker = async function(mId) {
   const fullName = document.getElementById(`edit-name-${mId}`).value.trim();
   const fin = document.getElementById(`edit-fin-${mId}`).value.trim();
