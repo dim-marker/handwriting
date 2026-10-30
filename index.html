@@ -2,7 +2,7 @@
 <html lang="az">
 <head>
   <meta charset="UTF-8">
-  <title>Əляazma Transkripsiya Platforması</title>
+  <title>Əlyazma Transkripsiya Platforması</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -53,7 +53,7 @@
     </div>
   </div>
 
-  <!-- İş Sahəsi (Workspace - Şəkil yuxarıda, idarəetmə altdadır) -->
+  <!-- İş Sahəsi (Workspace) -->
   <div id="workspace-card" class="card workspace-container hidden">
     <header class="workspace-header">
       <div>
@@ -65,11 +65,11 @@
 
     <div class="workspace-body-vertical">
       
-      <!-- 1. Şəkil Bölməsi (Yuxarıda və Böyük) -->
+      <!-- Şəkil Bölməsi (Yuxarıda, Böyük və Scroll/Zoom dəstəkli) -->
       <div class="image-viewer-full">
         <div class="image-toolbar">
           <h3 id="task-mode-title">Tapşırıq</h3>
-          <div class="zoom-info">Mausun diyircəyi (scroll) ilə böyüdüb kiçildə bilərsiniz</div>
+          <div class="zoom-info">🖱️ Şəkli böyütmək üçün mausun diyircəyini (scroll) fırladın</div>
           <button type="button" id="zoom-reset" class="zoom-reset-btn">Standart Ölçü</button>
         </div>
         <div class="image-wrapper-full" id="image-scroll-container">
@@ -77,10 +77,10 @@
         </div>
       </div>
 
-      <!-- 2. Redaktor və İdarəetmə Paneli (Şəkilin Altında) -->
+      <!-- Redaktor və İdarəetmə Paneli (Altda) -->
       <div class="editor-panel-full">
         
-        <!-- C/D Yoxlama Mərhələsi üçün İnteraktiv A və B Seçim Kartları -->
+        <!-- C/D Yoxlama Mərhələsi üçün Müqayisə Paneli -->
         <div id="comparison-panel" class="hidden comparison-box">
           <h4>Markerlərin Yazdıqları (Seçmək üçün üzərinə klikləyin):</h4>
           <div class="comparison-grid">
