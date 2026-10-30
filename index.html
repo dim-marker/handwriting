@@ -2,7 +2,7 @@
 <html lang="az">
 <head>
   <meta charset="UTF-8">
-  <title>Əlyazma Transkripsiya Platforması</title>
+  <title>Əляazma Transkripsiya Platforması</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -14,13 +14,11 @@
       <p>Markerlər üçün idarəetmə paneli</p>
     </div>
 
-    <!-- Tab Keçidləri -->
     <div class="auth-tabs">
       <button id="tab-login-btn" class="tab-btn active" onclick="switchAuthTab('login')">Giriş</button>
       <button id="tab-reg-btn" class="tab-btn" onclick="switchAuthTab('register')">Qeydiyyat</button>
     </div>
 
-    <!-- Giriş Formu -->
     <div id="form-login" class="auth-form">
       <div class="input-group">
         <label>İstifadəçi adı</label>
@@ -34,7 +32,6 @@
       <p id="login-error" class="error-text hidden">İstifadəçi adı və ya şifrə səhvdir!</p>
     </div>
 
-    <!-- Qeydiyyat Formu -->
     <div id="form-register" class="auth-form hidden">
       <div class="input-group">
         <label>Ad və Soyad</label>
@@ -56,7 +53,7 @@
     </div>
   </div>
 
-  <!-- İş Sahəsi (Workspace) -->
+  <!-- İş Sahəsi (Workspace - Şəkil yuxarıda, idarəetmə altdadır) -->
   <div id="workspace-card" class="card workspace-container hidden">
     <header class="workspace-header">
       <div>
@@ -66,33 +63,32 @@
       <button id="logout-btn" class="danger-btn">Çıxış</button>
     </header>
 
-    <div class="workspace-body">
-      <!-- Şəkil və Zoom Alətləri -->
-      <div class="image-viewer">
+    <div class="workspace-body-vertical">
+      
+      <!-- 1. Şəkil Bölməsi (Yuxarıda və Böyük) -->
+      <div class="image-viewer-full">
         <div class="image-toolbar">
           <h3 id="task-mode-title">Tapşırıq</h3>
-          <div class="zoom-btns">
-            <button type="button" id="zoom-in" title="Böyüt">+</button>
-            <button type="button" id="zoom-out" title="Kiçilt">-</button>
-            <button type="button" id="zoom-reset" title="Standart">Standart</button>
-          </div>
+          <div class="zoom-info">Mausun diyircəyi (scroll) ilə böyüdüb kiçildə bilərsiniz</div>
+          <button type="button" id="zoom-reset" class="zoom-reset-btn">Standart Ölçü</button>
         </div>
-        <div class="image-wrapper">
+        <div class="image-wrapper-full" id="image-scroll-container">
           <img id="task-image" src="" alt="Əlyazma şəkli">
         </div>
       </div>
 
-      <!-- Redaktor Paneli -->
-      <div class="editor-panel">
-        <!-- C/D Yoxlama mərhələsi üçün A və B yazılarını müqayisə paneli -->
+      <!-- 2. Redaktor və İdarəetmə Paneli (Şəkilin Altında) -->
+      <div class="editor-panel-full">
+        
+        <!-- C/D Yoxlama Mərhələsi üçün İnteraktiv A və B Seçim Kartları -->
         <div id="comparison-panel" class="hidden comparison-box">
-          <h4>Markerlərin Yazdıqları Mətnlər:</h4>
+          <h4>Markerlərin Yazdıqları (Seçmək üçün üzərinə klikləyin):</h4>
           <div class="comparison-grid">
-            <div class="text-card">
+            <div class="text-card selectable-card" id="card-a" onclick="selectTranscription('A')">
               <strong>A Markerinin Mətni:</strong>
               <p id="text-a-view">-</p>
             </div>
-            <div class="text-card">
+            <div class="text-card selectable-card" id="card-b" onclick="selectTranscription('B')">
               <strong>B Markerinin Mətni:</strong>
               <p id="text-b-view">-</p>
             </div>
@@ -101,10 +97,10 @@
 
         <div class="input-group">
           <label id="textarea-label">Mətn (Transkripsiya / Düzəliş):</label>
-          <textarea id="transcription-text" rows="5" placeholder="Buraya mətni yazın..."></textarea>
+          <textarea id="transcription-text" rows="4" placeholder="Buraya mətni yazın və ya yuxarıdan seçin..."></textarea>
         </div>
 
-        <!-- A və B markerləri üçün -->
+        <!-- A və B markerləri üçün düymələr -->
         <div id="writing-actions" class="action-buttons">
           <button id="submit-btn" class="primary-btn">Göndər</button>
           <button id="unreadable-btn" class="warning-btn">Oxunmazdır</button>
@@ -112,10 +108,12 @@
 
         <!-- C və D markerləri üçün yoxlama düymələri -->
         <div id="verification-actions" class="action-buttons hidden">
-          <button id="approve-btn" class="success-btn">Düzgündür (Təsdiqlə)</button>
-          <button id="correct-btn" class="warning-btn">Düzəliş et və yolla</button>
+          <button id="approve-btn" class="success-btn">Seçiləni Təsdiqlə (Düzgündür)</button>
+          <button id="correct-btn" class="warning-btn">Düzəliş Et və Göndər</button>
         </div>
+
       </div>
+
     </div>
   </div>
 
