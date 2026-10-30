@@ -7,61 +7,64 @@
 </head>
 <body>
 
-  <div class="container">
-    <h2>Real-Vaxt Admin Monitorinq Paneli</h2>
+  <!-- Admin Giriş Səhifəsi -->
+  <div id="admin-login-card" class="card auth-container">
+    <div class="auth-header">
+      <h2>Admin Paneli</h2>
+      <p>İdarəetmə üçün daxil olun</p>
+    </div>
+    <div class="input-group">
+      <label>İstifadəçi adı</label>
+      <input type="text" id="admin-username" placeholder="Admin istifadəçi adı">
+    </div>
+    <div class="input-group">
+      <label>Şifrə</label>
+      <input type="password" id="admin-password" placeholder="••••••••">
+    </div>
+    <button id="admin-login-btn" class="primary-btn">Daxil ol</button>
+    <p id="admin-login-error" class="error-text hidden">İstifadəçi adı və ya şifrə səhvdir!</p>
+  </div>
 
-    <!-- Statistika Kartları -->
-    <div class="stats-grid">
-      <div class="stat-card">
+  <!-- Admin Əsas Paneli -->
+  <div id="admin-dashboard" class="container hidden">
+    <header class="workspace-header">
+      <h2>Real-Vaxt Admin Monitorinq Paneli</h2>
+      <button id="admin-logout-btn" class="danger-btn">Çıxış</button>
+    </header>
+
+    <!-- Yığcam Statistika Kartları -->
+    <div class="stats-grid-compact">
+      <div class="stat-box-compact">
         <h3 id="stat-images">0</h3>
         <p>Ümumi Şəkillər</p>
       </div>
-      <div class="stat-card">
+      <div class="stat-box-compact">
         <h3 id="stat-texts">0</h3>
         <p>Yığılmış Yoxlamalar</p>
       </div>
-      <div class="stat-card">
+      <div class="stat-box-compact">
         <h3 id="stat-markers">0</h3>
         <p>Aktiv Markerlər</p>
       </div>
-      <div class="stat-card">
+      <div class="stat-box-compact">
         <h3 id="stat-unreadable">0</h3>
         <p>Oxunmaz Şəkillər</p>
       </div>
     </div>
-<!-- Yeni Marker Qeydiyyatı Formu -->
-<div class="card">
-  <h3>Yeni Marker Qeydiyyatı</h3>
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-    <div class="form-group">
-      <label>Ad:</label>
-      <input type="text" id="reg-name" placeholder="Məsələn: Əli">
+
+    <!-- Markerlərin Siyahısı və Redaktəsi (Accordion) -->
+    <div class="card accordion-card">
+      <div class="accordion-header" onclick="toggleAccordion('markers-accordion-content')">
+        <h3>👥 Markerlərin Siyahısı və Məlumatların Redaktəsi <span id="accordion-icon">▼</span></h3>
+      </div>
+      <div id="markers-accordion-content" class="accordion-content hidden">
+        <div id="markers-edit-container">
+          <!-- Dinamik marker redaktə xanaları dolacaq -->
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-      <label>Soyad:</label>
-      <input type="text" id="reg-surname" placeholder="Məsələn: Əliyev">
-    </div>
-    <div class="form-group">
-      <label>Ata Adı:</label>
-      <input type="text" id="reg-patronymic" placeholder="Məsələn: Vəli oğlu">
-    </div>
-    <div class="form-group">
-      <label>FİN Kod (7 simvol):</label>
-      <input type="text" id="reg-fin" maxlength="7" placeholder="Məsələn: 1234567">
-    </div>
-    <div class="form-group">
-      <label>İstifadəçi Adı (Login):</label>
-      <input type="text" id="reg-username" placeholder="Məsələn: a.aliyev">
-    </div>
-    <div class="form-group">
-      <label>Şifrə:</label>
-      <input type="password" id="reg-password" placeholder="Şifrə daxil edin">
-    </div>
-  </div>
-  <button id="register-marker-btn" class="success" style="margin-top: 10px;">Marker-i Qeydiyyata Al</button>
-  <p id="reg-success-msg" style="color: green; margin-top: 10px;" class="hidden">Marker uğurla qeydiyyata alındı!</p>
-</div>
-    <!-- Markerlərin Siyahısı və Perfomans -->
+
+    <!-- Marker Performansı (Orta Vaxt) -->
     <div class="card">
       <h3>Marker Performansı (Orta Vaxt)</h3>
       <table>
@@ -87,9 +90,9 @@
           <tr>
             <th>Şəkil</th>
             <th>Status</th>
-            <th>A/B Mətni</th>
+            <th>A Mətni</th>
+            <th>B Mətni</th>
             <th>C/D Təsdiq</th>
-            <th>Oxunmazlıq</th>
           </tr>
         </thead>
         <tbody id="tasks-table-body">
