@@ -52,15 +52,35 @@
       </div>
     </div>
 
-    <!-- Markerlərin Siyahısı və Redaktəsi (Accordion) -->
+   <!-- Markerlərin Siyahısı və Redaktəsi (Accordion və Axtarış ilə) -->
     <div class="card accordion-card">
       <div class="accordion-header" onclick="toggleAccordion('markers-accordion-content')">
         <h3>👥 Markerlərin Siyahısı və Məlumatların Redaktəsi <span id="accordion-icon">▼</span></h3>
       </div>
       <div id="markers-accordion-content" class="accordion-content hidden">
-        <div id="markers-edit-container">
-          <!-- Dinamik marker redaktə xanaları dolacaq -->
+        
+        <!-- Axtarış hissəsi -->
+        <div class="input-group" style="margin-bottom: 15px;">
+          <input type="text" id="marker-search-input" placeholder="Ad, Soyad və ya FİN ilə axtar..." onkeyup="filterMarkersTable()">
         </div>
+
+        <div style="overflow-x: auto;">
+          <table class="edit-table">
+            <thead>
+              <tr>
+                <th>Ad və Soyad</th>
+                <th>FİN Kod</th>
+                <th>İstifadəçi Adı</th>
+                <th>Şifrə</th>
+                <th>Əməliyyat</th>
+              </tr>
+            </thead>
+            <tbody id="markers-edit-table-body">
+              <!-- Dinamik cədvəl sətirləri dolacaq -->
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </div>
 
