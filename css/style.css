@@ -186,20 +186,24 @@ body {
 
 .image-wrapper {
   width: 100%;
-  max-height: 800px;
+  height: 700px; /* Hündürlüyü artırırıq ki, şəkil böyük görünsün */
   overflow: auto;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   background: #f8fafc;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .image-wrapper img {
-  display: block;
+  max-width: none !important; /* Şəklin avtomatik kiçilməsinin qarşısını alır */
+  width: 100%;                /* İlkin olaraq eni doldurur, zoom edildikdə böyüyür */
+  height: auto;
   transition: transform 0.2s ease;
   transform-origin: top left;
   cursor: grab;
-  width: 100%;
 }
 
 /* C/D Müqayisə Paneli */
