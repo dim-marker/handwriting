@@ -5,7 +5,7 @@ const adminDashboard = document.getElementById('admin-dashboard');
 const adminLoginBtn = document.getElementById('admin-login-btn');
 const adminLogoutBtn = document.getElementById('admin-logout-btn');
 
-let allMarkersData = []; // Axtarış üçün qlobal massiv
+let allMarkersData = [];
 
 // Admin Giriş Məntiqi
 adminLoginBtn.addEventListener('click', async () => {
@@ -42,6 +42,7 @@ adminLoginBtn.addEventListener('click', async () => {
 
 adminLogoutBtn.addEventListener('click', () => location.reload());
 
+// Accordion açılıb-bağlanma
 window.toggleAccordion = function(id) {
   const content = document.getElementById(id);
   content.classList.toggle('hidden');
@@ -55,7 +56,6 @@ function initAdminPanel() {
 
   const markersTableBody = document.getElementById('markers-table-body');
   const tasksTableBody = document.getElementById('tasks-table-body');
-  const markersEditTableBody = document.getElementById('markers-edit-table-body');
 
   onValue(ref(db), (snapshot) => {
     if (!snapshot.exists()) return;
@@ -75,14 +75,14 @@ function initAdminPanel() {
     });
 
     const markerList = Object.entries(users).filter(([id, u]) => u.role === 'marker');
-    allMarkersData = markerList; // Axtarış üçün yadda saxlayırıq
+    allMarkersData = markerList; // Axtarış üçün massivi yeniləyirik
 
     if (statImages) statImages.innerText = totalTasks;
     if (statTexts) statTexts.innerText = totalVerifications;
     if (statMarkers) statMarkers.innerText = markerList.length;
     if (statUnreadable) statUnreadable.innerText = totalUnreadable;
 
-    // Marker Redaktə Cədvəlini doldururuq
+    // Cədvəli ilkin olaraq doldururuq
     renderMarkersTable(markerList);
 
     // Marker Performans Cədvəli
@@ -120,14 +120,34 @@ function initAdminPanel() {
       });
     }
   });
+
+  // Axtarış inputuna birbaşa listener əlavə edirik (HTML-də onkeyup yazmağa ehtiyac qalmır)
+  const searchInput = document.getElementById('marker-search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      const filtered = allMarkersData.filter(([mId, m]) => {
+        const fullName = (m.fullName || '').toLowerCase();
+        const fin = (m.fin || '').toLowerCase();
+        const username = (m.username || '').toLowerCase();
+        return fullName.includes(query) || fin.includes(query) || username.includes(query);
+      });
+      renderMarkersTable(filtered);
+    });
+  }
 }
 
-// Markerlər cədvəlini (redaktə üçün) çəkən köməkçi funksiya
+// Cədvəli çəkən funksiya
 function renderMarkersTable(list) {
   const tbody = document.getElementById('markers-edit-table-body');
   if (!tbody) return;
 
   tbody.innerHTML = '';
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748b;">Marker tapılmadı</td></tr>`;
+    return;
+  }
+
   list.forEach(([mId, m]) => {
     tbody.innerHTML += `
       <tr>
@@ -140,19 +160,7 @@ function renderMarkersTable(list) {
   });
 }
 
-// Axtarış Funksiyası
-window.filterMarkersTable = function() {
-  const query = document.getElementById('marker-search-input').value.toLowerCase();
-  const filtered = allMarkersData.filter(([mId, m]) => {
-    const fullName = (m.fullName || '').toLowerCase();
-    const fin = (m.fin || '').toLowerCase();
-    const username = (m.username || '').toLowerCase();
-    return fullName.includes(query) || fin.includes(query) || username.includes(query);
-  });
-  renderMarkersTable(filtered);
-};
-
-// Marker məlumatlarını yeniləmək
+// Marker məlumatlarını yeniləmək (Qlobal edirik)
 window.updateMarker = async function(mId) {
   const fullName = document.getElementById(`edit-name-${mId}`).value.trim();
   const fin = document.getElementById(`edit-fin-${mId}`).value.trim();
