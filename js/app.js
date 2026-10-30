@@ -1,6 +1,5 @@
-import { db, ref, get, update } from './firebase-config.js';
+import { db, ref, get, set, update } from './firebase-config.js';
 
-// GitHub hesab və repozitoriya məlumatlarınız (Öz adlarınızla əvəz edin)
 const GITHUB_OWNER = "dim-marker"; 
 const GITHUB_REPO = "handwriting";  
 const GITHUB_PATH = "images";       
@@ -11,7 +10,6 @@ let currentTaskKey = null;
 let timerInterval = null;
 let secondsElapsed = 0;
 
-// DOM Elementləri
 const loginCard = document.getElementById('login-card');
 const workspaceCard = document.getElementById('workspace-card');
 const loginBtn = document.getElementById('login-btn');
@@ -21,10 +19,28 @@ const unreadableBtn = document.getElementById('unreadable-btn');
 const approveBtn = document.getElementById('approve-btn');
 const correctBtn = document.getElementById('correct-btn');
 
-// 1. Giriş Məntiqi (Login)
+window.switchAuthTab = function(tabName) {
+  const loginForm = document.getElementById('form-login');
+  const regForm = document.getElementById('form-register');
+  const loginTabBtn = document.getElementById('tab-login-btn');
+  const regTabBtn = document.getElementById('tab-reg-btn');
+
+  if (tabName === 'login') {
+    loginForm.classList.remove('hidden');
+    regForm.classList.add('hidden');
+    loginTabBtn.classList.add('active');
+    regTabBtn.classList.remove('active');
+  } else {
+    regForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+    regTabBtn.classList.add('active');
+    loginTabBtn.classList.remove('active');
+  }
+}
+
 loginBtn.addEventListener('click', async () => {
-  const u = document.getElementById('username').value.trim();
-  const p = document.getElementById('password').value.trim();
+  const u = document.getElementById('login-username').value.trim();
+  const p = document.getElementById('login-password').value.trim();
 
   if (!u || !p) {
     alert('Lütfən istifadəçi adı və şifrəni daxil edin!');
@@ -50,7 +66,43 @@ loginBtn.addEventListener('click', async () => {
   }
 });
 
-// 2. Vaxtölçən (Timer)
+document.getElementById('register-btn').addEventListener('click', async () => {
+  const fullName = document.getElementById('reg-fullname').value.trim();
+  const fin = document.getElementById('reg-fin').value.trim();
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value.trim();
+
+  if (!fullName || !fin || !username || !password) {
+    alert('Bütün qeydiyyat xanalarını doldurun!');
+    return;
+  }
+
+  const usersRef = ref(db, 'users');
+  const snapshot = await get(usersRef);
+  let users = snapshot.exists() ? snapshot.val() : {};
+
+  const exists = Object.values(users).some(user => user.username === username);
+  if (exists) {
+    alert('Bu istifadəçi adı artıq istifadədədir. Başqa ad seçin.');
+    return;
+  }
+
+  const newUserId = 'user_' + Date.now();
+  const newUserDat = {
+    fullName: fullName,
+    fin: fin,
+    username: username,
+    password: password,
+    role: 'marker',
+    completedCount: 0,
+    totalTimeSpentSec: 0
+  };
+
+  await set(ref(db, `users/${newUserId}`), newUserDat);
+  alert('Uğurla qeydiyyatdan keçdiniz! İndi giriş edə bilərsiniz.');
+  window.switchAuthTab('login');
+});
+
 function startTimer() {
   clearInterval(timerInterval);
   secondsElapsed = 0;
@@ -62,40 +114,36 @@ function startTimer() {
   }, 1000);
 }
 
-// 3. GitHub-dan Şəkilləri və Firebase-dən Tapşırıqları Yükləmək
 async function loadRandomTask() {
   startTimer();
   document.getElementById('transcription-text').value = '';
   
   try {
-    // GitHub qovluğundan şəkilləri çəkirik
     const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`);
     const files = await res.json();
 
     if (!Array.isArray(files)) {
-      alert('GitHub qovluğu oxunmadı! Repozitoriya adlarını yoxlayın.');
+      alert('GitHub qovluğu oxunmadı!');
       return;
     }
 
     const imageFiles = files.filter(f => f.type === 'file' && /\.(jpg|jpeg|png)$/i.test(f.name));
 
     if (imageFiles.length === 0) {
-      alert('GitHub "images" qovluğunda heç bir şəkil tapılmadı!');
+      alert('GitHub "images" qovluğunda şəkil tapılmadı!');
       return;
     }
 
     const snapshot = await get(ref(db, 'tasks'));
     const tasksData = snapshot.exists() ? snapshot.val() : {};
 
-    // Aktiv və uyğun şəkillərin filtrlənməsi
     const eligibleImages = imageFiles.filter(img => {
       const taskKey = img.name.replace(/\./g, '_');
       const t = tasksData[taskKey];
 
       if (t && t.status === 'completed') return false;
-      if (t && t.unreadable) return false; // Oxunmaz işarələnənləri ötür
+      if (t && t.unreadable) return false;
 
-      // İstifadəçi bu şəkildə əvvəlcədən iştirak edibsə keç
       const userInvolved = 
         (t?.transcriptions?.A?.markerId === currentUser.id) ||
         (t?.transcriptions?.B?.markerId === currentUser.id) ||
@@ -110,7 +158,6 @@ async function loadRandomTask() {
       return;
     }
 
-    // Təsadüfi şəkil seçimi
     const randomImage = eligibleImages[Math.floor(Math.random() * eligibleImages.length)];
     currentTaskKey = randomImage.name.replace(/\./g, '_');
 
@@ -122,7 +169,6 @@ async function loadRandomTask() {
 
     document.getElementById('task-image').src = currentTask.imageUrl;
 
-    // A, B (Yazma) yoxsa C, D (Yoxlama) rejimi
     const tCount = currentTask.transcriptions ? Object.keys(currentTask.transcriptions).length : 0;
     
     if (tCount < 2) {
@@ -140,11 +186,9 @@ async function loadRandomTask() {
 
   } catch (error) {
     console.error("Xəta baş verdi:", error);
-    alert('Şəkilləri yükləmək mümkün olmadı: ' + error.message);
   }
 }
 
-// 4. İşin Bazaya Yazılması və Statistika Yenilənməsi
 async function saveWork(dataPayload) {
   const userUpdates = {
     [`users/${currentUser.id}/totalTimeSpentSec`]: (currentUser.totalTimeSpentSec || 0) + secondsElapsed,
@@ -155,7 +199,6 @@ async function saveWork(dataPayload) {
   loadRandomTask();
 }
 
-// A və B markerləri üçün mətni göndərmə düyməsi
 submitBtn.addEventListener('click', () => {
   const text = document.getElementById('transcription-text').value.trim();
   if (!text) return alert('Lütfən mətni daxil edin!');
@@ -175,4 +218,53 @@ submitBtn.addEventListener('click', () => {
   saveWork(payload);
 });
 
-// C və D markerlə
+approveBtn.addEventListener('click', () => {
+  const slot = (!currentTask.verifications || !currentTask.verifications.C) ? 'C' : 'D';
+  const isCompleted = slot === 'D';
+
+  const payload = {
+    [`tasks/${currentTaskKey}/verifications/${slot}`]: {
+      markerId: currentUser.id,
+      approved: true,
+      durationSec: secondsElapsed,
+      timestamp: Date.now()
+    },
+    [`tasks/${currentTaskKey}/status`]: isCompleted ? 'completed' : 'verifying'
+  };
+
+  saveWork(payload);
+});
+
+correctBtn.addEventListener('click', () => {
+  const updatedText = document.getElementById('transcription-text').value.trim();
+  if (!updatedText) return alert('Düzəliş olunmuş mətni daxil edin!');
+
+  const slot = (!currentTask.verifications || !currentTask.verifications.C) ? 'C' : 'D';
+  const isCompleted = slot === 'D';
+
+  const payload = {
+    [`tasks/${currentTaskKey}/verifications/${slot}`]: {
+      markerId: currentUser.id,
+      approved: false,
+      correctedText: updatedText,
+      durationSec: secondsElapsed,
+      timestamp: Date.now()
+    },
+    [`tasks/${currentTaskKey}/status`]: isCompleted ? 'completed' : 'verifying'
+  };
+
+  saveWork(payload);
+});
+
+unreadableBtn.addEventListener('click', () => {
+  const payload = {
+    [`tasks/${currentTaskKey}/imageUrl`]: currentTask.imageUrl,
+    [`tasks/${currentTaskKey}/unreadable`]: true,
+    [`tasks/${currentTaskKey}/unreadableFlaggedBy`]: currentUser.id,
+    [`tasks/${currentTaskKey}/status`]: 'unreadable'
+  };
+  alert('Şəkil oxunmaz olaraq işarələndi.');
+  saveWork(payload);
+});
+
+logoutBtn.addEventListener('click', () => location.reload());
