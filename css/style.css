@@ -1,121 +1,216 @@
-:root {
-  --primary-color: #2563eb;
-  --secondary-color: #1e40af;
-  --bg-color: #f8fafc;
-  --card-bg: #ffffff;
-  --text-color: #1e293b;
-  --border-color: #e2e8f0;
-  --danger-color: #ef4444;
-  --success-color: #10b981;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  margin: 0;
-  padding: 0;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 20px auto;
+  background-color: #f8fafc;
+  color: #1e293b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   padding: 20px;
 }
 
-.card {
-  background: var(--card-bg);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+.hidden {
+  display: none !important;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.auth-header {
+  text-align: center;
   margin-bottom: 20px;
 }
 
-.hidden { display: none !important; }
+.auth-header h2 {
+  color: #0f172a;
+  margin-bottom: 5px;
+}
 
-/* Formlar */
-.form-group {
+.auth-header p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  color: #2563eb;
+  border-bottom: 2px solid #2563eb;
+  margin-bottom: -2px;
+}
+
+.input-group {
   margin-bottom: 15px;
 }
 
-label {
+.input-group label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
 }
 
-input[type="text"], input[type="password"], textarea {
+.input-group input,
+.input-group textarea {
   width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border-color);
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
-  box-sizing: border-box;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: #2563eb;
+}
+
+.workspace-container {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.user-badge {
   font-weight: 600;
-  transition: background 0.2s;
+  color: #0f172a;
+  margin-right: 15px;
 }
 
-button:hover { background-color: var(--secondary-color); }
-button.danger { background-color: var(--danger-color); }
-button.success { background-color: var(--success-color); }
+.timer-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
 
-/* Marker Layout */
-.workspace {
+.workspace-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-.image-container img {
+@media(max-width: 768px) {
+  .workspace-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.image-viewer h3 {
+  font-size: 15px;
+  margin-bottom: 10px;
+  color: #334155;
+}
+
+.image-viewer img {
   width: 100%;
-  max-height: 500px;
+  max-height: 400px;
   object-fit: contain;
-  border: 1px solid var(--border-color);
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
+  background: #f8fafc;
 }
 
-.timer-box {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--primary-color);
-  margin-bottom: 15px;
-}
-
-/* Admin Grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-bottom: 25px;
-}
-
-.stat-card {
-  background: #eff6ff;
-  padding: 15px;
-  border-radius: 6px;
-  text-align: center;
-}
-
-.stat-card h3 { margin: 0; font-size: 2rem; color: var(--primary-color); }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
+.action-buttons {
+  display: flex;
+  gap: 10px;
   margin-top: 15px;
 }
 
-th, td {
-  border: 1px solid var(--border-color);
-  padding: 10px;
-  text-align: left;
+.primary-btn {
+  width: 100%;
+  padding: 11px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-th { background-color: #f1f5f9; }
+.primary-btn:hover {
+  background: #1d4ed8;
+}
+
+.success-btn {
+  flex: 1;
+  padding: 10px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.warning-btn {
+  flex: 1;
+  padding: 10px;
+  background: #ca8a04;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.danger-btn {
+  padding: 8px 16px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.error-text {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 10px;
+  text-align: center;
+}
