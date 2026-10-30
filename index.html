@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Əlyazma Transkripsiya Platforması</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/viewer.css">
+</head>
+<body>
+
+  <!-- Giriş və Qeydiyyat Səhifəsi -->
+  <div id="login-card" class="card auth-container">
+    <div class="auth-header">
+      <h2>Əlyazma Platforması</h2>
+      <p>Markerlər üçün idarəetmə paneli</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button id="tab-login-btn" class="tab-btn active" onclick="switchAuthTab('login')">Giriş</button>
+      <button id="tab-reg-btn" class="tab-btn" onclick="switchAuthTab('register')">Qeydiyyat</button>
+    </div>
+
+    <div id="form-login" class="auth-form">
+      <div class="input-group">
+        <label>İstifadəçi adı</label>
+        <input type="text" id="login-username" placeholder="İstifadəçi adınızı daxil edin">
+      </div>
+      <div class="input-group">
+        <label>Şifrə</label>
+        <input type="password" id="login-password" placeholder="••••••••">
+      </div>
+      <button id="login-btn" class="primary-btn">Daxil ol</button>
+      <p id="login-error" class="error-text hidden">İstifadəçi adı və ya şifrə səhvdir!</p>
+    </div>
+
+    <div id="form-register" class="auth-form hidden">
+      <div class="input-group">
+        <label>Ad və Soyad</label>
+        <input type="text" id="reg-fullname" placeholder="Məsələn: Orxan İsmayılov">
+      </div>
+      <div class="input-group">
+        <label>FİN Kod</label>
+        <input type="text" id="reg-fin" placeholder="7 simvolikli FİN">
+      </div>
+      <div class="input-group">
+        <label>İstifadəçi adı</label>
+        <input type="text" id="reg-username" placeholder="Unikal istifadəçi adı seçin">
+      </div>
+      <div class="input-group">
+        <label>Şifrə</label>
+        <input type="password" id="reg-password" placeholder="Şifrə təyin edin">
+      </div>
+      <button id="register-btn" class="primary-btn">Qeydiyyatdan keç</button>
+    </div>
+  </div>
+
+  <!-- İş Sahəsi (Workspace) -->
+  <div id="workspace-card" class="card workspace-container hidden">
+    <header class="workspace-header">
+      <div>
+        <span id="user-info" class="user-badge"></span>
+        <span id="timer" class="timer-badge">00:00</span>
+      </div>
+      <button id="logout-btn" class="danger-btn">Çıxış</button>
+    </header>
+
+    <div class="workspace-body-vertical">
+
+      <!-- Müasir Şəkil İzləyicisi -->
+      <div class="viewer" id="viewer">
+
+        <div class="viewer-top">
+          <h3 class="viewer-title" id="task-mode-title">Tapşırıq</h3>
+          <div class="viewer-hint" id="viewer-hint">Scroll — zoom · Sürüşdür — hərəkət · 2× klik — yaxınlaşdır</div>
+        </div>
+
+        <div class="viewer-stage" id="image-scroll-container">
+          <div class="viewer-loader" id="viewer-loader"><span>Şəkil yüklənir...</span></div>
+          <div class="viewer-canvas" id="viewer-canvas">
+            <img id="task-image" src="" alt="Əlyazma şəkli" draggable="false">
+          </div>
+        </div>
+
+        <!-- Parlaqlıq / kontrast -->
+        <div class="viewer-adjust hidden" id="viewer-adjust">
+          <label>Parlaqlıq <span id="adj-brightness-val">100%</span></label>
+          <input type="range" id="adj-brightness" min="50" max="200" value="100">
+          <label>Kontrast <span id="adj-contrast-val">100%</span></label>
+          <input type="range" id="adj-contrast" min="50" max="250" value="100">
+          <button type="button" class="vreset" id="adj-reset">Sıfırla</button>
+        </div>
+
+        <!-- Alətlər paneli -->
+        <div class="viewer-toolbar">
+          <button type="button" class="vbtn" id="zoom-out" title="Kiçilt (-)">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/></svg>
+          </button>
+          <span class="vzoom" id="zoom-level">100%</span>
+          <button type="button" class="vbtn" id="zoom-in" title="Böyüt (+)">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6M11 8v6"/></svg>
+          </button>
+          <span class="vsep"></span>
+          <button type="button" class="vbtn" id="zoom-reset" title="Ekrana sığdır (0)">
+            <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+          </button>
+          <button type="button" class="vbtn" id="zoom-actual" title="Real ölçü (100%)">1:1</button>
+          <span class="vsep"></span>
+          <button type="button" class="vbtn" id="rotate-left" title="Sola fırlat (Shift+R)">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+          <button type="button" class="vbtn" id="rotate-right" title="Sağa fırlat (R)">
+            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          </button>
+          <span class="vsep"></span>
+          <button type="button" class="vbtn" id="adjust-btn" title="Parlaqlıq / kontrast">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
+          </button>
+          <button type="button" class="vbtn" id="fullscreen-btn" title="Tam ekran">
+            <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" transform="translate(0 0)"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Redaktor və İdarəetmə Paneli (Altda) -->
+      <div class="editor-panel-full">
+
+        <!-- C/D Yoxlama Mərhələsi üçün Müqayisə Paneli -->
+        <div id="comparison-panel" class="hidden comparison-box">
+          <h4>Markerlərin Yazdıqları (Seçmək üçün üzərinə klikləyin):</h4>
+          <div class="comparison-grid">
+            <div class="text-card selectable-card" id="card-a" onclick="selectTranscription('A')">
+              <strong>A Markerinin Mətni:</strong>
+              <p id="text-a-view">-</p>
+            </div>
+            <div class="text-card selectable-card" id="card-b" onclick="selectTranscription('B')">
+              <strong>B Markerinin Mətni:</strong>
+              <p id="text-b-view">-</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label id="textarea-label">Mətn (Transkripsiya / Düzəliş):</label>
+          <textarea id="transcription-text" rows="4" placeholder="Buraya mətni yazın və ya yuxarıdan seçin..."></textarea>
+        </div>
+
+        <!-- A və B markerləri üçün düymələr -->
+        <div id="writing-actions" class="action-buttons">
+          <button id="submit-btn" class="primary-btn">Göndər</button>
+          <button id="unreadable-btn" class="warning-btn">Oxunmazdır</button>
+        </div>
+
+        <!-- C və D markerləri üçün yoxlama düymələri -->
+        <div id="verification-actions" class="action-buttons hidden">
+          <button id="approve-btn" class="success-btn">Seçiləni Təsdiqlə (Düzgündür)</button>
+          <button id="correct-btn" class="warning-btn">Düzəliş Et və Göndər</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/viewer.js"></script>
+</body>
+</html>
