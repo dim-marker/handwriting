@@ -67,15 +67,41 @@
     </header>
 
     <div class="workspace-body">
+      <!-- Şəkil və Zoom Alətləri -->
       <div class="image-viewer">
-        <h3 id="task-mode-title">Tapşırıq</h3>
-        <img id="task-image" src="" alt="Əlyazma şəkli">
+        <div class="image-toolbar">
+          <h3 id="task-mode-title">Tapşırıq</h3>
+          <div class="zoom-btns">
+            <button type="button" id="zoom-in" title="Böyüt">+</button>
+            <button type="button" id="zoom-out" title="Kiçilt">-</button>
+            <button type="button" id="zoom-reset" title="Standart">Standart</button>
+          </div>
+        </div>
+        <div class="image-wrapper">
+          <img id="task-image" src="" alt="Əlyazma şəkli">
+        </div>
       </div>
 
+      <!-- Redaktor Paneli -->
       <div class="editor-panel">
+        <!-- C/D Yoxlama mərhələsi üçün A və B yazılarını müqayisə paneli -->
+        <div id="comparison-panel" class="hidden comparison-box">
+          <h4>Markerlərin Yazdıqları Mətnlər:</h4>
+          <div class="comparison-grid">
+            <div class="text-card">
+              <strong>A Markerinin Mətni:</strong>
+              <p id="text-a-view">-</p>
+            </div>
+            <div class="text-card">
+              <strong>B Markerinin Mətni:</strong>
+              <p id="text-b-view">-</p>
+            </div>
+          </div>
+        </div>
+
         <div class="input-group">
-          <label>Mətn (Transkripsiya / Düzəliş):</label>
-          <textarea id="transcription-text" rows="6" placeholder="Buraya oxuduğunuz mətni yazın..."></textarea>
+          <label id="textarea-label">Mətn (Transkripsiya / Düzəliş):</label>
+          <textarea id="transcription-text" rows="5" placeholder="Buraya mətni yazın..."></textarea>
         </div>
 
         <!-- A və B markerləri üçün -->
