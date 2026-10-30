@@ -225,21 +225,71 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Admin başlıqları və cədvəlləri üçün əlavə səliqə */
-h1, h2, h3 {
-  color: #0f172a;
-  margin-bottom: 15px;
+/* Admin Konteyner Üslubu */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 30px auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* Admin Başlıqları */
+h2, h3 {
+  color: #0f172a;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 6px;
+}
+
+/* Statistika Blokları (Ümumi Şəkillər, Yığılmışlar və s.) */
+.stats-container, div[style*="display: flex"], .admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+/* Qeydiyyat Formu Səliqəsi */
+.admin-form-section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 25px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+@media(max-width: 768px) {
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cədvəllər (Performans və Qeydlər) */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px;
+  margin-top: 10px;
+  margin-bottom: 25px;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
 
 th, td {
-  padding: 12px;
-  border: 1px solid #e2e8f0;
+  padding: 12px 15px;
+  border-bottom: 1px solid #e2e8f0;
   text-align: left;
   font-size: 14px;
 }
@@ -247,4 +297,9 @@ th, td {
 th {
   background-color: #f1f5f9;
   color: #334155;
+  font-weight: 600;
+}
+
+tr:hover {
+  background-color: #f8fafc;
 }
