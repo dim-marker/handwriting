@@ -108,9 +108,9 @@ body {
    ================================---------- */
 .workspace-container {
   width: 100%;
-  max-width: 950px;
+  max-width: 1350px; /* Əvvəlki 900px və ya 950px ölçüsünü daha da böyüdürük */
   background: #ffffff;
-  padding: 25px;
+  padding: 30px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
