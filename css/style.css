@@ -1,6 +1,6 @@
 /* ==========================================
    1. ÜMUMI VƏ RESET QAYDALARI
-   ================================---------- */
+   ========================================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -24,7 +24,7 @@ body {
 
 /* ==========================================
    2. GİRİŞ VƏ QEYDİYYAT (AUTH) QUTULARI
-   ================================---------- */
+   ========================================== */
 .auth-container {
   width: 100%;
   max-width: 420px;
@@ -73,8 +73,8 @@ body {
 }
 
 /* ==========================================
-   3. FORMLAR VƏ INPUTLAR
-   ================================---------- */
+   3. FORMLAR VƏ İNSTURMENTLƏR
+   ========================================== */
 .input-group {
   margin-bottom: 15px;
 }
@@ -104,8 +104,8 @@ body {
 }
 
 /* ==========================================
-   4. İŞ SAHƏSİ (WORKSPACE) - ŞAQULİ DÜZƏN (İNDEX.HTML)
-   ================================---------- */
+   4. İŞ SAHƏSİ (WORKSPACE) - ŞAQULİ DÜZƏN
+   ========================================== */
 .workspace-container {
   width: 100%;
   max-width: 1400px;
@@ -220,7 +220,7 @@ body {
   border: 1px solid #cbd5e1;
 }
 
-/* C/D Seçim Kartları (İnteraktiv) */
+/* C/D Seçim Kartları */
 .comparison-box {
   background: #ffffff;
   padding: 15px;
@@ -284,7 +284,7 @@ body {
 
 /* ==========================================
    5. ADMIN PANELİ (CONTAINER, STATİSTİKA, CƏDVƏLLƏR)
-   ================================---------- */
+   ========================================== */
 .container {
   width: 100%;
   max-width: 1200px;
@@ -304,17 +304,6 @@ h1, h2, h3 {
   padding-bottom: 6px;
 }
 
-/* Statistika Blokları Grid Sistemi */
-.stats-container, 
-.admin-stats,
-div[style*="display: flex"] {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
-  margin-bottom: 25px;
-}
-
-/* Yığcam Statistika Grid */
 .stats-grid-compact {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -380,7 +369,7 @@ div[style*="display: flex"] {
   border-top: 1px solid #e2e8f0;
 }
 
-/* Marker Redaktə Cədvəli Üslubları */
+/* Cədvəllər və Redaktə Inputları */
 .edit-table input {
   width: 100%;
   padding: 6px 10px;
@@ -412,7 +401,6 @@ div[style*="display: flex"] {
   background: #15803d;
 }
 
-/* Admin Cədvəlləri Ümumi */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -443,7 +431,7 @@ tr:hover {
 
 /* ==========================================
    6. DÜYMƏLƏR (BUTTONS)
-   ================================---------- */
+   ========================================== */
 .primary-btn {
   width: 100%;
   padding: 11px;
